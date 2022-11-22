@@ -1,5 +1,7 @@
 import classes from './Card.module.css';
 
-const Card = () => {};
+const Card = ({ children, className }) => {
+  return <div className={`${classes.card} ${className}`}>{children}</div>;
+};
 
 export default Card;
