@@ -1,15 +1,41 @@
 import classes from './Login.module.css';
 import Card from '../UI/Card/Card';
 import Button from '../UI/Button/Button';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
+
+const initialEmailState = {
+  value: '',
+  isValid: false,
+};
+
+// Email reducer function
+const emailReducer = (state = initialEmailState, action) => {
+  switch (action.type) {
+    case 'USER_INPUT': {
+      return { ...state, value: action.val, isValid: action.val.includes('@') };
+    }
+    case 'INPUT_BLUR': {
+      return { ...state, isValid: state.value.includes('@') };
+    }
+    default: {
+      return state;
+    }
+  }
+};
 
 const Login = ({ onLogin }) => {
-  // States
-  const [enteredEmail, setEnteredEmail] = useState('');
-  const [emailIsValid, setEmailIsValid] = useState();
+  // Managing state using useState
+  // const [enteredEmail, setEnteredEmail] = useState('');
+  // const [emailIsValid, setEmailIsValid] = useState();
   const [enteredPassword, setEnteredPassword] = useState('');
   const [passwordIsValid, setPasswordIsValid] = useState('');
   const [formIsValid, setFormIsValid] = useState();
+
+  // Managing state using useReducer
+  const [emailState, dispatchEmail] = useReducer(
+    emailReducer,
+    initialEmailState
+  );
 
   useEffect(() => {
     console.log('EFFECT RUNNING');
@@ -19,27 +45,30 @@ const Login = ({ onLogin }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const identifier = setTimeout(() => {
-      console.log('Checking form validity');
-      setFormIsValid(
-        enteredEmail.includes('@') && enteredPassword.trim().length > 6
-      );
-    }, 500);
-    return () => {
-      console.log('CLEANUP');
-      clearTimeout(identifier);
-    };
-  }, [enteredEmail, enteredPassword]);
+  // useEffect(() => {
+  //   const identifier = setTimeout(() => {
+  //     console.log('Checking form validity');
+  //     setFormIsValid(
+  //       enteredEmail.includes('@') && enteredPassword.trim().length > 6
+  //     );
+  //   }, 500);
+  //   return () => {
+  //     console.log('CLEANUP');
+  //     clearTimeout(identifier);
+  //   };
+  // }, [enteredEmail, enteredPassword]);
 
   // Email input handler
   const emailChangeHandler = (event) => {
-    setEnteredEmail(event.target.value);
+    // setEnteredEmail(event.target.value);
+
+    // Dispatch email action type
+    dispatchEmail({ type: 'USER_INPUT', val: event.target.value });
 
     // Check if email & password input is valid and update form validation state
-    // setFormIsValid(
-    //   event.target.value.includes('@') && enteredPassword.trim().length > 6
-    // );
+    setFormIsValid(
+      event.target.value.includes('@') && enteredPassword.trim().length > 6
+    );
   };
 
   // Password input handler
@@ -54,7 +83,8 @@ const Login = ({ onLogin }) => {
 
   // Validate email input
   const validateEmailHandler = () => {
-    setEmailIsValid(enteredEmail.includes('@'));
+    // setEmailIsValid(enteredEmail.includes('@'));
+    dispatchEmail({ type: 'INPUT_BLUR' });
   };
 
   // Validate password input
@@ -65,21 +95,21 @@ const Login = ({ onLogin }) => {
   // Form submission handler
   const submitHandler = (event) => {
     event.preventDefault();
-    onLogin(enteredEmail, enteredPassword);
+    onLogin(emailState.value, enteredPassword);
   };
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
         <div
           className={`${classes.control} ${
-            emailIsValid === false ? classes.invalid : ''
+            emailState.isValid === false ? classes.invalid : ''
           }`}
         >
           <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
-            value={enteredEmail}
+            value={emailState.value}
             onChange={emailChangeHandler}
             onBlur={validateEmailHandler}
           />
