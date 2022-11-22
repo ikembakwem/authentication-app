@@ -1,11 +1,11 @@
 import classes from './MainHeader.module.css';
 import Navigation from './Navigation';
 
-const MainHeader = ({ onLogout }) => {
+const MainHeader = () => {
   return (
     <header className={classes['main-header']}>
       <h1>A typical page</h1>
-      <Navigation onLogout={onLogout} />
+      <Navigation />
     </header>
   );
 };
