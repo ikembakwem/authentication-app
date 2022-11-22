@@ -12,6 +12,14 @@ const Login = ({ onLogin }) => {
   const [formIsValid, setFormIsValid] = useState();
 
   useEffect(() => {
+    console.log('EFFECT RUNNING');
+
+    return () => {
+      console.log('EFFECT CLEANUP');
+    };
+  }, []);
+
+  useEffect(() => {
     const identifier = setTimeout(() => {
       console.log('Checking form validity');
       setFormIsValid(
